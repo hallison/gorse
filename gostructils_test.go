@@ -1,4 +1,4 @@
-package main_test
+package gostructils_test
 
 import (
   "testing"
@@ -7,16 +7,29 @@ import (
 )
 
 type Curso struct {
-  ID   int
-	Nome string
-  Grau string
+  ID   int            `db:"primary_key"`
+  Nome string         `db:"required"`
+  Grau string         `db:""`
+  DataInsercao string `db:""`
 }
 
-func TestFields(t *testing.T) {
-  var fields = Fields(&Curso{})
+var TABLE = "curso"
+var COLUMNS = []string {
+  "id",
+  "nome",
+  "grau",
+  "data_insercao",
+}
 
-  if len(fields) == 0 {
-		t.Errorf("struct deve ter pelo menos 1 atributo")
+func TestAttributes(t *testing.T) {
+  var table, _, fields = Attributes(&Curso{})
+
+  if len(fields) != len(COLUMNS) {
+    t.Errorf("%v colunas carregadas de %v atribuídas", len(fields), len(COLUMNS))
+  }
+
+  if table != "curso" {
+    t.Errorf("%s deve ser igual à 'curso'", table)
   }
 }
 
@@ -36,17 +49,19 @@ func TestUndescore(t *testing.T) {
 }
 
 func TestDML(t *testing.T) {
-  var columns = []string{ "id", "nome", "grau" }
   var statements = map[string]string {
-    "INSERT INTO curso (id, nome, grau) VALUES (curso_sq.NEXTVAL, :nome, :grau)": dml.Insert("curso", "id", "curso_sq", columns),
-    "SELECT id, nome, grau FROM curso": dml.Select("curso", columns),
-    "UPDATE curso SET nome = :nome, grau = :grau": dml.Update("curso", columns),
-    "DELETE curso WHERE (id = 1)": dml.Delete("curso", "id", 1),
+    "INSERT INTO curso (id, nome, grau, data_insercao) VALUES (curso_id.NEXTVAL, :NOME, :GRAU, :DATA_INSERCAO)": dml.RawSqlInsert("curso", "id", "curso_id", COLUMNS),
+    "SELECT id, nome, grau, data_insercao FROM curso": dml.RawSqlSelect("curso", COLUMNS),
+    "UPDATE curso SET (nome = :NOME), (grau = :GRAU), (data_insercao = :DATA_INSERCAO)": dml.RawSqlUpdate("curso", COLUMNS[1:]),
+    "DELETE curso": dml.RawSqlDelete("curso"),
+    "WHERE (id = :ID)": dml.RawSqlWhere("id = :ID"),
+    "(nome = :NOME) AND (grau = :GRAU) AND (data_insercao = :DATA_INSERCAO)": dml.RawSqlLogical("and", COLUMNS[1:]),
+    "(nome = :NOME) OR (grau = :GRAU) OR (data_insercao = :DATA_INSERCAO)": dml.RawSqlLogical("or", COLUMNS[1:]),
   }
 
   for fix, test := range(statements) {
     if test != fix {
-        t.Errorf("SQL/DML '%s' deve ser igual a '%s'", test, fix)
+      t.Errorf("SQL/DML '%s' deve ser igual a '%s'", test, fix)
     }
   }
 }

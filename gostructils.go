@@ -1,8 +1,9 @@
-package main
+package gostructils
 
 import (
+. "fmt"
   "reflect"
-  "strings"
+. "strings"
   "regexp"
 )
 
@@ -18,17 +19,37 @@ func Underscore(s string) string {
 			a = append(a, sub[2])
 		}
 	}
-	return strings.ToLower(strings.Join(a, "_"))
+	return ToLower(Join(a, "_"))
 }
 
-func Fields(base interface{}) []string {
-  var structure = reflect.ValueOf(base).Elem()
-  var attribute = structure.Type()
+// Attributes: returns table, primaryKey, sequence, columns
+func Attributes(base interface{}) (string, string, []string) {
+  var baseObjct = reflect.ValueOf(base).Elem()
+  var baseTable = baseObjct.Type()
+  var basePrKey = ""
+  var table string
+  var sequence string
   var columns []string
 
-  for i := 0; i < structure.NumField(); i++ {
-    columns = append(columns, attribute.Field(i).Name)
+  for i := 0; i < baseObjct.NumField(); i++ {
+    var field = baseTable.Field(i)
+    var tag, found = field.Tag.Lookup("db")
+    if found {
+      if tag == "primary_key" {
+        basePrKey = ToLower(field.Name)
+      } else {
+        columns = append(columns, ToLower(field.Name))
+      }
+    }
   }
 
-  return columns
+  table = ToLower(baseTable.Name())
+
+  if len(basePrKey) > 0 {
+    sequence = Sprintf("%s_%s", table, basePrKey)
+  } else {
+    sequence = Sprintf("%s_sq", table)
+  }
+
+  return table, sequence, append([]string{basePrKey}, columns ...)
 }
