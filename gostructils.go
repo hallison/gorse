@@ -7,7 +7,7 @@ import (
   "regexp"
 )
 
-func Underscore(s string) string {
+func ToUnderscore(s string) string {
   // https://gist.github.com/vermotr/dd9cfe74169234ef7380e8f32a8fbce9
   var camel = regexp.MustCompile("(^[^A-Z0-9]*|[A-Z0-9]*)([A-Z0-9][^A-Z]+|$)")
 	var a []string
@@ -21,7 +21,6 @@ func Underscore(s string) string {
 	}
 	return ToLower(Join(a, "_"))
 }
-
 // Attributes: returns table, primaryKey, sequence, columns
 func Attributes(base interface{}) (string, string, []string) {
   var baseObjct = reflect.ValueOf(base).Elem()
@@ -36,14 +35,14 @@ func Attributes(base interface{}) (string, string, []string) {
     var tag, found = field.Tag.Lookup("db")
     if found {
       if tag == "primary_key" {
-        basePrKey = ToLower(field.Name)
+        basePrKey = ToUnderscore(field.Name)
       } else {
-        columns = append(columns, ToLower(field.Name))
+        columns = append(columns, ToUnderscore(field.Name))
       }
     }
   }
 
-  table = ToLower(baseTable.Name())
+  table = ToUnderscore(baseTable.Name())
 
   if len(basePrKey) > 0 {
     sequence = Sprintf("%s_%s", table, basePrKey)
