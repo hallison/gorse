@@ -1,9 +1,9 @@
-package gostructils_test
+package gorse_test
 
 import (
   "testing"
-. "git.prodam.am.gov.br/dinov/gostructils"
-  "git.prodam.am.gov.br/dinov/gostructils/dml"
+. "github.com/hallison/gorse"
+  "github.com/hallison/gorse/dml"
 )
 
 type Curso struct {

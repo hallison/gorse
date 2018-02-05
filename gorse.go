@@ -1,4 +1,4 @@
-package gostructils
+package gorse
 
 import (
 . "fmt"

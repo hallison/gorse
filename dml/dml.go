@@ -3,7 +3,7 @@ package dml
 import (
 . "fmt"
 . "strings"
-. "git.prodam.am.gov.br/dinov/gostructils"
+. "github.com/hallison/gorse"
 )
 
 func RawSqlInsert(table, id, sequence string, columns []string) string {
