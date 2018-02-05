@@ -24,16 +24,22 @@ func ToUnderscore(s string) string {
 
 // Attributes: returns table name, sequence name, columns
 func Attributes(base interface{}) (string, string, []string) {
+  var pkPattern = regexp.MustCompile("(primary[_ ]key|pk|pkey)")
   var baseObjct, baseTable = findObjects(base)
   var basePrKey, table, sequence string
   var columns []string
 
   for i := 0; i < baseObjct.NumField(); i++ {
     var field = baseTable.Field(i)
-    var tag, found = field.Tag.Lookup("db")
+    var line, found = field.Tag.Lookup("db")
+    var tags []string
     if found {
-      if tag == "primary_key" {
+      line = ToLower(line)
+      tags = Split(line, ",")
+      if pkPattern.MatchString(line) {
         basePrKey = ToUnderscore(field.Name)
+      } else if len(tags[0]) > 0 {
+        columns = append(columns, ToLower(tags[0]))
       } else {
         columns = append(columns, ToUnderscore(field.Name))
       }

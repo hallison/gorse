@@ -7,10 +7,10 @@ import (
 )
 
 type Curso struct {
-  ID   int            `db:"primary_key"`
-  Nome string         `db:"required"`
-  Grau string         `db:""`
-  DataInsercao string `db:""`
+  ID   int            `db:"ID,PRIMARY KEY"`
+  Nome string         `db:"NOME,REQUIRED"`
+  Grau string         `db:"GRAU,"`
+  DataInsercao string `db:"DATA_INSERCAO"`
 }
 
 var TABLE = "curso"
