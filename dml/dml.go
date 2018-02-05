@@ -73,9 +73,11 @@ func (table *Table) Sql() string {
 }
 
 func (table *Table) Insert(base interface{}) *Table {
+  var _, _, fields = Attributes(base)
+  var columns = append([]string{fields[0]}, NonemptyAttributes(base)...)
   if !table.HasClausule {
     table.HasClausule = false
-    table.Statement = RawSqlInsert(table.Name, table.Columns[0], table.Sequence, table.Columns)
+    table.Statement = RawSqlInsert(table.Name, fields[0], table.Sequence, columns)
   }
 
   return table
@@ -95,7 +97,7 @@ func (table *Table) Select(args ...string) *Table {
 
 func (table *Table) Update(base interface{}) *Table {
   table.HasClausule = true
-  table.Statement = RawSqlUpdate(table.Name, table.Columns[1:])
+  table.Statement = RawSqlUpdate(table.Name, NonemptyAttributes(base))
 
   return table
 }

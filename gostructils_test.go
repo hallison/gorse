@@ -70,6 +70,7 @@ func TestDML(t *testing.T) {
 
   statements = map[string]string {
     "INSERT INTO curso (id, nome, grau, data_insercao) VALUES (curso_id.NEXTVAL, :NOME, :GRAU, :DATA_INSERCAO)": table.Insert(curso).Sql(),
+    "INSERT INTO curso (id, nome, grau) VALUES (curso_id.NEXTVAL, :NOME, :GRAU)": table.Insert(&Curso{ Nome: "Outro Teste", Grau: "2" }).Sql(),
     "SELECT id, nome, grau, data_insercao FROM curso": table.Select().Sql(),
     "SELECT nome, grau FROM curso": table.Select("nome", "grau").Sql(),
     "SELECT nome FROM curso WHERE (grau = :GRAU)": table.Select("nome").Where("grau = :GRAU").Sql(),
@@ -78,6 +79,8 @@ func TestDML(t *testing.T) {
     "SELECT nome FROM curso WHERE (grau IN (:GRAUS))": table.Select("nome").Where("grau IN (:GRAUS)").Sql(),
     "UPDATE curso SET (nome = :NOME), (grau = :GRAU), (data_insercao = :DATA_INSERCAO)": table.Update(curso).Sql(),
     "UPDATE curso SET (nome = :NOME), (grau = :GRAU), (data_insercao = :DATA_INSERCAO) WHERE (id = :ID)": table.Update(curso).Where("id = :ID").Sql(),
+    "UPDATE curso SET (nome = :NOME), (grau = :GRAU)": table.Update(&Curso{ Nome: "Outro Teste", Grau: "2" }).Sql(),
+    "UPDATE curso SET (nome = :NOME), (grau = :GRAU) WHERE (id = :ID)": table.Update(&Curso{ Nome: "Outro Teste", Grau: "2" }).Where("id = :ID").Sql(),
     "DELETE curso": table.Delete().Sql(),
     "DELETE curso WHERE (id = :ID)": table.Delete().Where("id = :ID").Sql(),
   }
