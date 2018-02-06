@@ -102,5 +102,29 @@ func TestDML(t *testing.T) {
       t.Errorf("SQL/DML: '%s' deve ser igual a '%s'", test, fix)
     }
   }
+}
 
+func TestConfig(t *testing.T) {
+  var config *dml.Config
+  var shouldEqual = func(a, b interface{}) {
+    if a != b {
+      t.Errorf("Config: '%s' deve ser igual a '%s'", a, b)
+    }
+  }
+
+  config = dml.NewConfig("jason/voorhees@crystallake:1521/friday13th")
+
+  shouldEqual(config.User, "jason")
+  shouldEqual(config.Password, "voorhees")
+  shouldEqual(config.Host, "crystallake")
+  shouldEqual(config.Port, "1521")
+  shouldEqual(config.SID, "friday13th")
+
+  config = dml.NewConfig("jason/voorhees@crystallake/friday13th")
+
+  shouldEqual(config.User, "jason")
+  shouldEqual(config.Password, "voorhees")
+  shouldEqual(config.Host, "crystallake")
+  shouldEqual(config.Port, "1521")
+  shouldEqual(config.SID, "friday13th")
 }

@@ -4,6 +4,7 @@ import (
 . "fmt"
 . "strings"
 . "github.com/hallison/gorse"
+  "regexp"
 )
 
 func RawSqlInsert(table, id, sequence string, columns []string) string {
@@ -42,7 +43,36 @@ func RawSqlDescOrderBy(columns []string) string {
   return Sprintf("%s DESC", RawSqlOrderBy(columns))
 }
 
-// var statement, condition, aggregator string
+type Config struct {
+  Host, Port, SID, User, Password, URI string
+}
+
+func NewConfig(uri string) *Config {
+  var urlPattern = regexp.MustCompile("(.*?)/(.*?)@(.*?):?(.*?)?/(.*)")
+  var urlSpliter = regexp.MustCompile("[/@:]")
+  var portPattern = regexp.MustCompile(":[0-9]{4}")
+
+  if !urlPattern.MatchString(uri) {
+    return nil
+  }
+
+  var fields = urlSpliter.Split(uri, -1)
+
+  if !portPattern.MatchString(uri) {
+    fields = append(fields, fields[3])
+    fields[3] = "1521"
+  }
+
+  return &Config {
+    User: fields[0],
+    Password: fields[1],
+    Host: fields[2],
+    Port: fields[3],
+    SID: fields[4],
+    URI: uri,
+  }
+}
+
 type DML struct {
   HasClausule bool // WHERE, GROUP, HAVING, ORDER
   HasLogical  bool // AND, OR, NOT
