@@ -57,6 +57,10 @@ func TestDML(t *testing.T) {
     "WHERE (id = :ID)": dml.RawSqlWhere("id = :ID"),
     "(nome = :NOME) AND (grau = :GRAU) AND (data_insercao = :DATA_INSERCAO)": dml.RawSqlLogicalAllColumns("and", COLUMNS[1:]),
     "(nome = :NOME) OR (grau = :GRAU) OR (data_insercao = :DATA_INSERCAO)": dml.RawSqlLogicalAllColumns("or", COLUMNS[1:]),
+    "ORDER BY nome": dml.RawSqlOrderBy(COLUMNS[1:2]),
+    "ORDER BY nome, grau": dml.RawSqlOrderBy(COLUMNS[1:3]),
+    "ORDER BY nome DESC": dml.RawSqlDescOrderBy(COLUMNS[1:2]),
+    "ORDER BY nome, grau DESC": dml.RawSqlDescOrderBy(COLUMNS[1:3]),
   }
 
   for fix, test := range(statements) {
@@ -83,6 +87,10 @@ func TestDML(t *testing.T) {
     "UPDATE curso SET (nome = :NOME), (grau = :GRAU) WHERE (id = :ID)": table.Update(&Curso{ Nome: "Outro Teste", Grau: "2" }).Where("id = :ID").Sql(),
     "DELETE curso": table.Delete().Sql(),
     "DELETE curso WHERE (id = :ID)": table.Delete().Where("id = :ID").Sql(),
+    "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome": table.Select().OrderBy("nome").Sql(),
+    "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome, grau": table.Select().OrderBy("nome", "grau").Sql(),
+    "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome DESC": table.Select().DescOrderBy("nome").Sql(),
+    "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome, grau DESC": table.Select().DescOrderBy("nome", "grau").Sql(),
   }
 
   for fix, test := range(statements) {

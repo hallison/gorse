@@ -34,6 +34,14 @@ func RawSqlLogicalAllColumns(operator string, columns []string) string {
   return Sprintf("%s", Join(pairsOf(columns), Sprintf(" %s ", ToUpper(operator))))
 }
 
+func RawSqlOrderBy(columns []string) string {
+  return Sprintf("ORDER BY %s", Join(columns, ", "))
+}
+
+func RawSqlDescOrderBy(columns []string) string {
+  return Sprintf("%s DESC", RawSqlOrderBy(columns))
+}
+
 // var statement, condition, aggregator string
 type DML struct {
   HasClausule bool // WHERE, GROUP, HAVING, ORDER
@@ -124,6 +132,22 @@ func (table *Table) And(condition string) *Table {
 func (table *Table) Or(condition string) *Table {
   if table.HasClausule && table.HasLogical {
     table.SQL = append(table.SQL, RawSqlLogical("or", condition))
+  }
+
+  return table
+}
+
+func (table *Table) OrderBy(fields ...string) *Table {
+  if table.HasClausule {
+    table.SQL = append(table.SQL, RawSqlOrderBy(fields))
+  }
+
+  return table
+}
+
+func (table *Table) DescOrderBy(fields ...string) *Table {
+  if table.HasClausule {
+    table.SQL = append(table.SQL, RawSqlDescOrderBy(fields))
   }
 
   return table
