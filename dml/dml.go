@@ -129,9 +129,25 @@ func (table *Table) And(condition string) *Table {
   return table
 }
 
+func (table *Table) AndNot(condition string) *Table {
+  if table.HasClausule && table.HasLogical {
+    table.SQL = append(table.SQL, RawSqlLogical("and not", condition))
+  }
+
+  return table
+}
+
 func (table *Table) Or(condition string) *Table {
   if table.HasClausule && table.HasLogical {
     table.SQL = append(table.SQL, RawSqlLogical("or", condition))
+  }
+
+  return table
+}
+
+func (table *Table) OrNot(condition string) *Table {
+  if table.HasClausule && table.HasLogical {
+    table.SQL = append(table.SQL, RawSqlLogical("or not", condition))
   }
 
   return table
