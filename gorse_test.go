@@ -3,7 +3,6 @@ package gorse_test
 import (
   "testing"
 . "github.com/hallison/gorse"
-  "github.com/hallison/gorse/dml"
 )
 
 type Curso struct {
@@ -48,19 +47,19 @@ func TestUndescore(t *testing.T) {
   }
 }
 
-func TestDML(t *testing.T) {
+func TestDMLRawSql(t *testing.T) {
   var statements = map[string]string {
-    "INSERT INTO curso (id, nome, grau, data_insercao) VALUES (curso_id.NEXTVAL, :NOME, :GRAU, :DATA_INSERCAO)": dml.RawSqlInsert("curso", "id", "curso_id", COLUMNS),
-    "SELECT id, nome, grau, data_insercao FROM curso": dml.RawSqlSelect("curso", COLUMNS),
-    "UPDATE curso SET (nome = :NOME), (grau = :GRAU), (data_insercao = :DATA_INSERCAO)": dml.RawSqlUpdate("curso", COLUMNS[1:]),
-    "DELETE curso": dml.RawSqlDelete("curso"),
-    "WHERE (id = :ID)": dml.RawSqlWhere("id = :ID"),
-    "(nome = :NOME) AND (grau = :GRAU) AND (data_insercao = :DATA_INSERCAO)": dml.RawSqlLogicalAllColumns("and", COLUMNS[1:]),
-    "(nome = :NOME) OR (grau = :GRAU) OR (data_insercao = :DATA_INSERCAO)": dml.RawSqlLogicalAllColumns("or", COLUMNS[1:]),
-    "ORDER BY nome": dml.RawSqlOrderBy(COLUMNS[1:2]),
-    "ORDER BY nome, grau": dml.RawSqlOrderBy(COLUMNS[1:3]),
-    "ORDER BY nome DESC": dml.RawSqlDescOrderBy(COLUMNS[1:2]),
-    "ORDER BY nome, grau DESC": dml.RawSqlDescOrderBy(COLUMNS[1:3]),
+    "INSERT INTO curso (id, nome, grau, data_insercao) VALUES (curso_id.NEXTVAL, :NOME, :GRAU, :DATA_INSERCAO)": RawSqlInsert("curso", "id", "curso_id", COLUMNS),
+    "SELECT id, nome, grau, data_insercao FROM curso": RawSqlSelect("curso", COLUMNS),
+    "UPDATE curso SET (nome = :NOME), (grau = :GRAU), (data_insercao = :DATA_INSERCAO)": RawSqlUpdate("curso", COLUMNS[1:]),
+    "DELETE curso": RawSqlDelete("curso"),
+    "WHERE (id = :ID)": RawSqlWhere("id = :ID"),
+    "(nome = :NOME) AND (grau = :GRAU) AND (data_insercao = :DATA_INSERCAO)": RawSqlLogicalAllColumns("and", COLUMNS[1:]),
+    "(nome = :NOME) OR (grau = :GRAU) OR (data_insercao = :DATA_INSERCAO)": RawSqlLogicalAllColumns("or", COLUMNS[1:]),
+    "ORDER BY nome": RawSqlOrderBy(COLUMNS[1:2]),
+    "ORDER BY nome, grau": RawSqlOrderBy(COLUMNS[1:3]),
+    "ORDER BY nome DESC": RawSqlDescOrderBy(COLUMNS[1:2]),
+    "ORDER BY nome, grau DESC": RawSqlDescOrderBy(COLUMNS[1:3]),
   }
 
   for fix, test := range(statements) {
@@ -68,11 +67,12 @@ func TestDML(t *testing.T) {
       t.Errorf("SQL/DML: '%s' deve ser igual a '%s'", test, fix)
     }
   }
+}
 
-  var table = dml.NewTable(&Curso{})
+func TestDMLTable(t *testing.T) {
+  var table = NewTable(&Curso{})
   var curso = &Curso{ Nome: "Teste", Grau: "1", DataInsercao: "20180205" }
-
-  statements = map[string]string {
+  var statements = map[string]string {
     "INSERT INTO curso (id, nome, grau, data_insercao) VALUES (curso_id.NEXTVAL, :NOME, :GRAU, :DATA_INSERCAO)": table.Insert(curso).Sql(),
     "INSERT INTO curso (id, nome, grau) VALUES (curso_id.NEXTVAL, :NOME, :GRAU)": table.Insert(&Curso{ Nome: "Outro Teste", Grau: "2" }).Sql(),
     "SELECT id, nome, grau, data_insercao FROM curso": table.Select().Sql(),
@@ -102,29 +102,4 @@ func TestDML(t *testing.T) {
       t.Errorf("SQL/DML: '%s' deve ser igual a '%s'", test, fix)
     }
   }
-}
-
-func TestConfig(t *testing.T) {
-  var config *dml.Config
-  var shouldEqual = func(a, b interface{}) {
-    if a != b {
-      t.Errorf("Config: '%s' deve ser igual a '%s'", a, b)
-    }
-  }
-
-  config = dml.NewConfig("jason/voorhees@crystallake:1521/friday13th")
-
-  shouldEqual(config.User, "jason")
-  shouldEqual(config.Password, "voorhees")
-  shouldEqual(config.Host, "crystallake")
-  shouldEqual(config.Port, "1521")
-  shouldEqual(config.SID, "friday13th")
-
-  config = dml.NewConfig("jason/voorhees@crystallake/friday13th")
-
-  shouldEqual(config.User, "jason")
-  shouldEqual(config.Password, "voorhees")
-  shouldEqual(config.Host, "crystallake")
-  shouldEqual(config.Port, "1521")
-  shouldEqual(config.SID, "friday13th")
 }
