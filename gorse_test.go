@@ -91,6 +91,8 @@ func TestDML(t *testing.T) {
     "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome, grau": table.Select().OrderBy("nome", "grau").Sql(),
     "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome DESC": table.Select().DescOrderBy("nome").Sql(),
     "SELECT id, nome, grau, data_insercao FROM curso ORDER BY nome, grau DESC": table.Select().DescOrderBy("nome", "grau").Sql(),
+    "SELECT id, nome, grau, data_insercao FROM curso WHERE (grau = :GRAU) ORDER BY nome": table.Select().Where("grau = :GRAU").OrderBy("nome").Sql(),
+    "SELECT id, nome, grau, data_insercao FROM curso WHERE (grau = :GRAU) AND (data_insercao = :DATA_INSERCAO) ORDER BY nome": table.Select().Where("grau = :GRAU").And("data_insercao = :DATA_INSERCAO").OrderBy("nome").Sql(),
   }
 
   for fix, test := range(statements) {
